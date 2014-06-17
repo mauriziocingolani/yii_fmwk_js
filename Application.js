@@ -2,7 +2,7 @@
  * Application.js
  * 
  * Contiene tutto il codice del framework.
- * @version 1.0.19
+ * @version 1.0.20
  */
 
 /**
@@ -313,6 +313,8 @@ Field.prototype.validate = function(value) {
             compare = this.form.getField(this.compare).field.datepicker('getDate');//valore del campo di confronto
         } else if (this.number) {
             compare = this.number == 'int' ? parseInt(this.form.getFieldValue(this.compare), 10) : parseFloat(this.form.getFieldValue(this.compare));//valore del campo di confronto
+        } else {
+            compare = this.form.getFieldValue(this.compare);
         }
         if (value) {
             switch (this.compareOperator) {
