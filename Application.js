@@ -2,7 +2,7 @@
  * Application.js
  * 
  * Contiene tutto il codice del framework.
- * @version 1.0.20
+ * @version 1.0.21
  */
 
 /**
@@ -16,7 +16,7 @@ var Application = {
      * e quindi fa scomparire lo schermo di preload.
      * @param {function} callback Funzione da eseguire prima dell'eliminazione dello schermo
      */
-    start: function(callback) {
+    start: function (callback) {
         /* Inizializzazioni */
         $.datepicker.setDefaults({
             //regional
@@ -51,7 +51,7 @@ var Application = {
         $("[data-toggle='tooltip']").tooltip();
         /* Pulsanti scelta file */
         $(document)
-                .on('change', '.btn-file :file', function() {
+                .on('change', '.btn-file :file', function () {
                     var input = $(this);
                     input.trigger('fileselect', [input[0].files[0]]);
                 });
@@ -60,16 +60,16 @@ var Application = {
         $('#preloader').delay(500).fadeOut(1000);
         $('body').delay(1000).css({'overflow': 'visible'});
     },
-    noDocumentDragAndDrop: function() {
-        $(document).on('dragenter', function(e) {
+    noDocumentDragAndDrop: function () {
+        $(document).on('dragenter', function (e) {
             e.stopPropagation();
             e.preventDefault();
         });
-        $(document).on('dragover', function(e) {
+        $(document).on('dragover', function (e) {
             e.stopPropagation();
             e.preventDefault();
         });
-        $(document).on('drop', function(e) {
+        $(document).on('drop', function (e) {
             e.stopPropagation();
             e.preventDefault();
         });
@@ -86,12 +86,12 @@ var Application = {
  * @param {object} Eventuale lista di parametri da passare alla form
  * @returns {Form} Oggetto Form
  */
-var Form = function(formName, validateOnChange, options) {
+var Form = function (formName, validateOnChange, options) {
     this.name = formName;
     this.options = options;
     var fields = {};
     var form = this;
-    $('#' + formName + ' .form-control, #' + formName + ' .form-control-static, #' + formName + ' .checkbox').each(function() {
+    $('#' + formName + ' .form-control, #' + formName + ' .form-control-static, #' + formName + ' .checkbox').each(function () {
         fields[$(this).attr('id')] = new Field(form, $(this), validateOnChange);
     });
     this.fields = fields;
@@ -101,10 +101,10 @@ var Form = function(formName, validateOnChange, options) {
  * Esegue la validazione dei campi della form e ne imposta lo stato.
  * @returns {boolean} Validità della form
  */
-Form.prototype.validate = function() {
+Form.prototype.validate = function () {
     var valid = true;
     var validation;
-    $.each(this.fields, $.proxy(function(key, value) {
+    $.each(this.fields, $.proxy(function (key, value) {
         validation = value.validate();
         value.setErrorStatus(validation);
         if (validation !== true)
@@ -117,7 +117,7 @@ Form.prototype.validate = function() {
  * @param {string} fieldName
  * @returns {Field} Oggetto field corrispondente 
  */
-Form.prototype.getField = function(fieldName) {
+Form.prototype.getField = function (fieldName) {
     return this.fields[this.name + '_' + fieldName];
 }
 
@@ -127,7 +127,7 @@ Form.prototype.getField = function(fieldName) {
  * @param {string} fieldName Nome del campo
  * @returns {string} Valore contenuto nel campo
  */
-Form.prototype.getFieldValue = function(fieldName) {
+Form.prototype.getFieldValue = function (fieldName) {
     return this.getField(fieldName).getValue();
 }
 /**
@@ -137,7 +137,7 @@ Form.prototype.getFieldValue = function(fieldName) {
  * @param {mixed} value Valore da assegnare al campo
  * @returns {string} Valore contenuto nel campo
  */
-Form.prototype.setFieldValue = function(fieldName, value) {
+Form.prototype.setFieldValue = function (fieldName, value) {
     this.getField(fieldName).setValue(value);
 }
 
@@ -148,7 +148,7 @@ Form.prototype.setFieldValue = function(fieldName, value) {
  * @param {string} event Evento da impstare ('click',...)
  * @param {function} callable Callback da invocare
  */
-Form.prototype.setFieldEvent = function(fieldName, event, callable) {
+Form.prototype.setFieldEvent = function (fieldName, event, callable) {
     this.fields[this.name + '_' + fieldName].field.on(event, callable);
 }
 
@@ -177,7 +177,7 @@ Form.prototype.setFieldEvent = function(fieldName, event, callable) {
  * @param {boolean} validateOnChange True per impostare la validazione automatica a ogni modifica
  * @returns {Field} Oggetto FIeld
  */
-var Field = function(form, field, validateOnChange) {
+var Field = function (form, field, validateOnChange) {
     this.field = field;
     this.id = field.attr('id');
     this.div = $('#' + field.attr('id') + '_div');
@@ -211,14 +211,14 @@ var Field = function(form, field, validateOnChange) {
         this.field.autocomplete({
             source: options,
             minLength: 0,
-            select: $.proxy(function(event, ui) {
+            select: $.proxy(function (event, ui) {
                 this.setErrorStatus(this.validate(ui.item ? ui.item.label : ''));
             }, this),
-            change: $.proxy(function(event, ui) {
+            change: $.proxy(function (event, ui) {
                 this.setErrorStatus(this.validate(ui.item ? ui.item.label : ''));
             }, this)
         });
-        $('#' + this.id + '_button').on('click', $.proxy(function() {
+        $('#' + this.id + '_button').on('click', $.proxy(function () {
             this.field.autocomplete('search', '');
             this.field.focus();
         }, this));
@@ -226,9 +226,9 @@ var Field = function(form, field, validateOnChange) {
     }
     if (this.field.attr('data-number')) {
         this.number = this.field.attr('data-number');
-        this.min = this.number == 'int' ? parseInt(this.field.attr('data-min'), 10) : parseFloat(this.field.attr('data-min'));
+        this.min = this.field.attr('data-min') != undefined && this.field.attr('data-min').length > 0 ? (this.number == 'int' ? parseInt(this.field.attr('data-min'), 10) : parseFloat(this.field.attr('data-min'))) : null;
         this.minMessage = this.field.attr('data-min-message');
-        this.max = this.number == 'int' ? parseInt(this.field.attr('data-max'), 10) : parseFloat(this.field.attr('data-max'));
+        this.max = this.field.attr('data-max') != undefined && this.field.attr('data-max').length > 0 ? (this.number == 'int' ? parseInt(this.field.attr('data-max'), 10) : parseFloat(this.field.attr('data-max'))) : null;
         this.maxMessage = this.field.attr('data-max-message');
     }
     if (this.field.attr('data-compare')) {
@@ -238,7 +238,7 @@ var Field = function(form, field, validateOnChange) {
         this.compareMessage = this.field.attr('data-compare-message');
     }
     if (this.field.attr('data-uppercase') || this.field.attr('data-lowercase') || this.field.attr('data-propercase') || this.field.attr('data-trim')) {
-        this.field.on('blur', $.proxy(function(event) {
+        this.field.on('blur', $.proxy(function (event) {
             var t = $('#' + event.target.id);
             var value = t.val();
             if (this.field.attr('data-uppercase')) {
@@ -260,7 +260,7 @@ var Field = function(form, field, validateOnChange) {
     if (this.field.attr('data-sn-editor')) {
         var opts = form.options == undefined ? {} : (form.options.sn || {});
         if (validateOnChange) {
-            opts.onblur = $.proxy(function() {
+            opts.onblur = $.proxy(function () {
                 this.setErrorStatus(this.validate());
             }, this);
         }
@@ -268,7 +268,7 @@ var Field = function(form, field, validateOnChange) {
     }
     if (validateOnChange) {
         if (!this.field.attr('data-sn-editor')) {
-            field.on('change', $.proxy(function() {
+            field.on('change', $.proxy(function () {
                 this.setErrorStatus(this.validate());
             }, this));
         }
@@ -283,7 +283,7 @@ var Field = function(form, field, validateOnChange) {
  * @param {string} value Valore da usare per la validazione (opzionale)
  * @returns {Boolean} True se il valore del campo ha superato la validazione
  */
-Field.prototype.validate = function(value) {
+Field.prototype.validate = function (value) {
     if (value === undefined)
         value = this.getValue();
     if (this.required && value.length <= 0) {
@@ -301,9 +301,9 @@ Field.prototype.validate = function(value) {
     }
     if (this.number) {
         var number = this.number == 'int' ? parseInt(value, 10) : parseFloat(value);
-        if (this.min && number < this.min)
+        if (this.min !== null && number < this.min)
             return this.minMessage || this.field.attr('data-invalid-message');
-        if (this.max && number > this.max)
+        if (this.max !== null && number > this.max)
             return this.maxMessage || this.field.attr('data-invalid-message');
     }
     if (this.compare) {
@@ -346,7 +346,7 @@ Field.prototype.validate = function(value) {
  * e reso visibile. 
  * @param {string} message Messaggio di errore
  */
-Field.prototype.setErrorStatus = function(message) {
+Field.prototype.setErrorStatus = function (message) {
     if (message !== undefined && message.length > 0) {
         this.div.addClass('has-error');
         this.errormessage.text(message);
@@ -362,7 +362,7 @@ Field.prototype.setErrorStatus = function(message) {
  * e restituito 1 oppure 0.
  * @returns {mixed} Valore contenuto nel campo
  */
-Field.prototype.getValue = function() {
+Field.prototype.getValue = function () {
     if (this.field.attr('type') == 'checkbox') {
         return this.field.is(':checked') ? 1 : 0;
     } else if (this.field.attr('data-sn-editor')) {
@@ -376,7 +376,7 @@ Field.prototype.getValue = function() {
  * il metodo .val().
  * @param {mixed} value Valore da assegnare al campo
  */
-Field.prototype.setValue = function(value) {
+Field.prototype.setValue = function (value) {
     this.field.val(value);
 }
 /**
@@ -391,7 +391,7 @@ Field.prototype.setValue = function(value) {
  * @param {Date} date Oggetto Date selezionato tramite datepicker.
  * @returns {Boolean} True se la data è corretta e valida, false altrimenti
  */
-Field.prototype.validateDate = function(dateString, date, required) {
+Field.prototype.validateDate = function (dateString, date, required) {
     if ((dateString == null || dateString === '') && (required == undefined || required === false))
         return true;
     if (!/^[0-9]{2}\/[0-9]{2}\/[0-9]{4}$/g.test(dateString.toString()))
@@ -412,7 +412,7 @@ Field.prototype.validateDate = function(dateString, date, required) {
  * @param mixed blockUIMessage Stringa oppure oggetto con elementi 'title' e 'message'
  * @param array params
  */
-var AjaxRequest = function(controller, action, messageDiv, blockUIMessage, params) {
+var AjaxRequest = function (controller, action, messageDiv, blockUIMessage, params) {
     if (controller === undefined || action === undefined || params === undefined)
         throw 'AjaxRequest constructor -  undefined parameter: controller, action or params';
     var url = '/' + controller + '/' + action;
@@ -436,13 +436,13 @@ var AjaxRequest = function(controller, action, messageDiv, blockUIMessage, param
         type: params.method || 'POST',
         dataType: 'json',
         data: params.params,
-        success: $.proxy(function(json) {
+        success: $.proxy(function (json) {
             /* sblocco schermo */
             if (blockUIMessage !== undefined && blockUIMessage !== null)
                 ModalDialog.hide();
             params.onSuccess(json, messageDiv);
         }, this),
-        error: $.proxy(function(xhr, textStatus, errorThrown) {
+        error: $.proxy(function (xhr, textStatus, errorThrown) {
             /* sblocco schermo */
             if (blockUIMessage !== undefined && blockUIMessage !== null)
                 ModalDialog.hide();
@@ -471,12 +471,12 @@ var Message = {
      * @param {type} ajaxError Messaggio di errore restituito dalla chiamata Ajax
      * @param {type} afterFinishCallback Funzinoe da eseguire dopo che il messaggio è comparso
      */
-    show: function(div, message, isError, ajaxError, afterFinishCallback) {
+    show: function (div, message, isError, ajaxError, afterFinishCallback) {
         var msg = typeof div === 'string' ? $('#' + div) : div;
         msg.html(message + (ajaxError ? ' Error ' + ajaxError.status + ' ' + ajaxError.statusText : ''));
         msg.addClass(isError ? 'alert-danger' : 'alert-success');
         msg.removeClass(isError ? 'alert-success' : 'alert-danger');
-        msg.fadeIn('slow', function() {
+        msg.fadeIn('slow', function () {
             if (afterFinishCallback)
                 afterFinishCallback();
         });
@@ -490,12 +490,12 @@ var Message = {
      * @param {object} xhr Errore Ajax
      * @param {function} afterFinishCallback Funzione da eseguire dopo aver mostrato il messaggio di errore
      */
-    showAjaxError: function(div, xhr, afterFinishCallback) {
+    showAjaxError: function (div, xhr, afterFinishCallback) {
         var msg = typeof div === 'string' ? $('#' + div) : div;
         msg.html('ERRORE AJAX. Error ' + xhr.status + ' ' + xhr.statusText + (xhr.responseText.length > 0 ? ' : <em>' + xhr.responseText + '</em>' : ''));
         msg.addClass('alert-danger');
         msg.removeClass('alert-success');
-        msg.fadeIn('slow', function() {
+        msg.fadeIn('slow', function () {
             if (afterFinishCallback)
                 afterFinishCallback();
         });
@@ -509,12 +509,12 @@ var Message = {
      * @param {function} successCallback Callback in caso di successo
      * @param {function} errorCallback Callback in caso di errore
      */
-    showOverJson: function(div, json, successCallback, errorCallback) {
+    showOverJson: function (div, json, successCallback, errorCallback) {
         var msg = typeof div === 'string' ? $('#' + div) : div;
         msg.html(json.message);
         msg.addClass(json.error ? 'alert-danger' : 'alert-success');
         msg.removeClass(json.error ? 'alert-success' : 'alert-danger');
-        msg.fadeIn('slow', function() {
+        msg.fadeIn('slow', function () {
             if (!json.error && successCallback) {
                 successCallback();
             } else if (json.error && errorCallback) {
@@ -539,7 +539,7 @@ var ModalDialog = {
     /**
      * 
      */
-    init: function() {
+    init: function () {
         if (this.div === null) {
             this.div = $('#main-modal');
             this.title = $('#main-modal-title');
@@ -550,13 +550,13 @@ var ModalDialog = {
             });
         }
     },
-    show: function(title, content) {
+    show: function (title, content) {
         this.init();
         this.title.html(title);
         this.content.html(content ? content : title + '. Attendere prego...');
         this.div.modal('show');
     },
-    hide: function() {
+    hide: function () {
         this.div.modal('hide');
     }
 }
@@ -580,7 +580,7 @@ var ModalDialog = {
  * @param {string} action Nome dell'azione che gestirà il trasferimento del file
  * @param {object} params Parametri 
  */
-var PictureDragAndDropHandler = function(div, controller, action, params) {
+var PictureDragAndDropHandler = function (div, controller, action, params) {
     // argomenti
     this.div = typeof div == 'string' ? $('#' + div) : div;
     this.controller = controller;
@@ -591,7 +591,7 @@ var PictureDragAndDropHandler = function(div, controller, action, params) {
     this.label = $('#' + div.attr('id') + '_label');
     this.img = $('#' + div.attr('id') + '_img');
     this.clear = $('#' + div.attr('id') + '_clear');
-    this.clear.click($.proxy(function() {
+    this.clear.click($.proxy(function () {
         this.img.attr('src', null);
         this.img.hide();
         this.label.html(null);
@@ -599,7 +599,7 @@ var PictureDragAndDropHandler = function(div, controller, action, params) {
         this.span.show();
         this.clear.hide();
     }, this));
-    $('#' + div.attr('id') + ' .btn-file :file').on('fileselect', $.proxy(function(event, file) {
+    $('#' + div.attr('id') + ' .btn-file :file').on('fileselect', $.proxy(function (event, file) {
         this.transfer(file);
     }, this));
     if (params.message)
@@ -611,22 +611,22 @@ var PictureDragAndDropHandler = function(div, controller, action, params) {
  * Il drag assegna (e poi toglie) la classe 'drop' alla div principale, mentre il 
  * drop recupera i dati relativi al file droppato e li passa al metodo transfer().
  */
-PictureDragAndDropHandler.prototype.initDnd = function() {
-    this.div.on('dragenter', $.proxy(function(e) {
+PictureDragAndDropHandler.prototype.initDnd = function () {
+    this.div.on('dragenter', $.proxy(function (e) {
         e.stopPropagation();
         e.preventDefault();
         this.div.addClass('drop');
     }, this));
-    this.div.on('dragleave', $.proxy(function(e) {
+    this.div.on('dragleave', $.proxy(function (e) {
         e.stopPropagation();
         e.preventDefault();
         this.div.removeClass('drop');
     }, this));
-    this.div.on('dragover', $.proxy(function(e) {
+    this.div.on('dragover', $.proxy(function (e) {
         e.stopPropagation();
         e.preventDefault();
     }, this));
-    this.div.on('drop', $.proxy(function(e) {
+    this.div.on('drop', $.proxy(function (e) {
         this.div.removeClass('drop');
         e.preventDefault();
         var files = e.originalEvent.dataTransfer.files;
@@ -638,7 +638,7 @@ PictureDragAndDropHandler.prototype.initDnd = function() {
  * Esegue il caricamento del file sul server via Ajax.
  * @param {object} file File droppato
  */
-PictureDragAndDropHandler.prototype.transfer = function(file) {
+PictureDragAndDropHandler.prototype.transfer = function (file) {
     var fd = new FormData;
     fd.append('file', file);
     if (this.params.path)
@@ -649,10 +649,10 @@ PictureDragAndDropHandler.prototype.transfer = function(file) {
     var progressBar = $('#progressbar');
     progressBar.progressbar();
     $.ajax({
-        xhr: function() {
+        xhr: function () {
             var xhrobj = $.ajaxSettings.xhr();
             if (xhrobj.upload) {
-                xhrobj.upload.addEventListener('progress', function(event) {
+                xhrobj.upload.addEventListener('progress', function (event) {
                     var percent = 0;
                     var position = event.loaded || event.position;
                     var total = event.total;
@@ -670,7 +670,7 @@ PictureDragAndDropHandler.prototype.transfer = function(file) {
         cache: false,
         data: fd,
         dataType: 'json',
-        success: $.proxy(function(json) {
+        success: $.proxy(function (json) {
             if (this.img) {
                 this.img.attr('src', json.data);
                 this.img.show();
@@ -685,7 +685,7 @@ PictureDragAndDropHandler.prototype.transfer = function(file) {
             if (this.params.onSuccess)
                 this.params.onSuccess(json, this.message);
         }, this),
-        error: $.proxy(function(error) {
+        error: $.proxy(function (error) {
             ModalDialog.hide();
             if (this.params.error)
                 this.params.error(error, this.message);
@@ -696,22 +696,22 @@ PictureDragAndDropHandler.prototype.transfer = function(file) {
  * Restituisce il contenuto di src dell'immagine droppata.
  * @returns {string} Percorso completo dell'immagine.
  */
-PictureDragAndDropHandler.prototype.getImgPath = function() {
+PictureDragAndDropHandler.prototype.getImgPath = function () {
     return this.img.attr('src');
 }
 /**
  * Restituisce il contenuto della label con il percorso del file droppato.
  * @returns {string} Percorso completo del file.
  */
-PictureDragAndDropHandler.prototype.getFilePath = function() {
+PictureDragAndDropHandler.prototype.getFilePath = function () {
     return this.label.text();
 }
 
 /* Metodi per le stringhe */
-String.prototype.toProperCase = function() {
+String.prototype.toProperCase = function () {
     var smallWords = /^(zjfhjd?\.?|via)$/i;
 
-    return this.replace(/[A-Za-z0-9\u00C0-\u00FF]+[^\s-']*/g, function(match, index, title) {
+    return this.replace(/[A-Za-z0-9\u00C0-\u00FF]+[^\s-']*/g, function (match, index, title) {
         if (index > 0 && index + match.length !== title.length &&
                 match.search(smallWords) > -1 && title.charAt(index - 2) !== ":" &&
                 (title.charAt(index + match.length) !== '-' || title.charAt(index - 1) === '-') &&
@@ -726,6 +726,6 @@ String.prototype.toProperCase = function() {
         return match.charAt(0).toUpperCase() + match.substr(1);
     });
 };
-String.prototype.textBeforeFirstUnderscore = function() {
+String.prototype.textBeforeFirstUnderscore = function () {
     return this.substring(0, this.indexOf('_'));
 }
