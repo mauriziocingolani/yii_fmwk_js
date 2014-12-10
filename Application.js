@@ -2,7 +2,7 @@
  * Application.js
  * 
  * Contiene tutto il codice del framework.
- * @version 1.0.21
+ * @version 1.0.22
  */
 
 /**
@@ -286,7 +286,7 @@ var Field = function (form, field, validateOnChange) {
 Field.prototype.validate = function (value) {
     if (value === undefined)
         value = this.getValue();
-    if (this.required && value.length <= 0) {
+    if (this.required && (value.length <= 0 || (this.field.attr('type') == 'checkbox' && value === 0))) {
         return this.field.attr('data-missing-message');
     }
     if (this.regexp && value.length > 0 && !this.regexp.test(value)) {
